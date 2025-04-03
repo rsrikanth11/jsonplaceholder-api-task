@@ -1,5 +1,22 @@
 ### **Overview**
-This project provides an API test automation framework for validating the functionality of the JSONPlaceholder API (https://jsonplaceholder.typicode.com/). The framework is built using **Java** with **RestAssured** and **JUnit 5**. It covers various test scenarios, including positive and negative test cases for user and post management.
+This project contains a suite of API tests designed to validate the behavior of the **JSONPlaceholder API**. The tests are built using **RestAssured**, **JUnit 5**, and **SLF4J** for logging.
+
+## API Test Suite
+
+The API test suite includes tests to verify:
+- Searching users by username
+- Fetching user posts and validating emails in comments
+- Handling negative test cases for non-existing users and posts
+- Edge test cases for empty and special characters in usernames
+
+## Dependencies
+
+This project uses the following libraries:
+
+- **RestAssured** for API testing
+- **JUnit 5** for writing and running tests
+- **SLF4J** for logging
+- **Apache Commons Validator** for email validation
 
 ### **Test Setup**
 #### Prerequisites:
@@ -12,7 +29,7 @@ This project provides an API test automation framework for validating the functi
 #### Steps to Set Up Locally:
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-repository/jsonplaceholder-tests.git
+   git clone https://github.com/rsrikanth11/jsonplaceholder-tests.git
    cd jsonplaceholder-tests
    ```
 
@@ -31,26 +48,25 @@ This project provides an API test automation framework for validating the functi
 ### **Test Cases**
 The test cases validate different workflows for the JSONPlaceholder API. They include:
 
-1. **Search User by Username** (`testSearchUserByUsername`)
-   - Validates that the user "Delphine" can be found by username.
+Test Cases
+1. testSearchUserByVariousUsernames
+This test verifies that searching for a user by username returns the correct user. It checks for usernames such as "Delphine", "Bret", and "Samantha".
 
-2. **Search Posts by User** (`testSearchPostsByUser`)
-   - Validates that posts are returned for the user "Delphine".
+2. testSearchPostsByUser
+This test verifies that fetching posts by a user ID returns valid posts. It also validates that emails in comments are in the correct format.
 
-3. **Validate Email Format in Comments** (`testValidateEmailFormatInComments`)
-   - Ensures that emails in comments for posts made by the user "Delphine" follow a valid email format.
+3. testSearchUserByInvalidUsername
+This test checks that searching for a non-existent username returns no results (HTTP status 404).
 
-4. **Check No Posts for User** (`testNoPostsForUser`)
-   - Verifies that there are no posts for a non-existent user.
+4. testSearchUserByEmptyUsername
+This test ensures that searching for a user by an empty string returns no results.
 
-5. **Comment with Invalid Email Format** (`testCommentWithInvalidEmail`)
-   - Validates that all comments for a specific post have valid email addresses.
+5. testSearchUserByUsernameWithSpecialChars
+This test checks that searching for a username containing special characters returns no results.
 
-6. **Search User by Invalid Username** (`testSearchUserByInvalidUsername`)
-   - Checks the response when searching for a user with a non-existent username.
+6. testSearchPostsByNonExistentUser
+This test ensures that searching for posts by a non-existent user ID returns no posts.
 
-7. **Get Comments for Non-Existent Post** (`testCommentsForNonExistentPost`)
-   - Ensures that no comments are returned for a non-existent post.
 
 ### **Test Execution**
 #### Running the Tests:
@@ -70,7 +86,7 @@ Tests are also integrated into CircleCI for continuous integration. The CircleCI
 - You can find the CircleCI configuration in `.circleci/config.yml`.
 
 ### **Test Results**
-After running the tests, the results will be displayed in the terminal (if running locally) or in the CircleCI dashboard. A successful run will show a message like:
+After running the tests, the results will be displayed in the terminal. A successful run will show a message like:
 ```
 Tests run: 7, Failures: 0, Errors: 0, Skipped: 0
 ```
