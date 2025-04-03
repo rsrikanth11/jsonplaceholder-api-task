@@ -23,7 +23,7 @@ public class ApiTests {
         assertEquals(200, response.statusCode(), "Expected HTTP status 200");
         List<Map<String, Object>> users = response.jsonPath().getList("$");
         assertTrue(users.size() > 0, "User should be found");
-        System.out.println("✅ testSearchUserByUsername PASSED");
+        System.out.println("Test 'testSearchUserByUsername' PASSED");
     }
 
     // 2. Test to search posts by the user
@@ -34,7 +34,7 @@ public class ApiTests {
         assertEquals(200, response.statusCode(), "Expected HTTP status 200");
         List<Map<String, Object>> posts = response.jsonPath().getList("$");
         assertTrue(posts.size() > 0, "Posts should be found");
-        System.out.println("✅ testSearchPostsByUser PASSED");
+        System.out.println("Test 'testSearchPostsByUser' PASSED");
     }
 
     // 3. Test to validate email format in comments
@@ -58,7 +58,7 @@ public class ApiTests {
             });
         });
 
-        System.out.println("✅ testValidateEmailFormatInComments PASSED");
+        System.out.println("Test 'testValidateEmailFormatInComments' PASSED");
     }
 
     // 4. Test to check if no posts exist for a user
@@ -68,7 +68,7 @@ public class ApiTests {
         assertEquals(200, response.statusCode(), "Expected HTTP status 200");
         List<Map<String, Object>> posts = response.jsonPath().getList("$");
         assertTrue(posts.isEmpty(), "There should be no posts for this user");
-        System.out.println("✅ testNoPostsForUser PASSED");
+        System.out.println("Test 'testNoPostsForUser' PASSED");
     }
 
     // 5. Test to check comment with invalid email format
@@ -84,7 +84,7 @@ public class ApiTests {
                 fail("Invalid email format found: " + email);
             }
         });
-        System.out.println("✅ testCommentWithInvalidEmail PASSED");
+        System.out.println("Test 'testCommentWithInvalidEmail' PASSED");
     }
 
     // 6. Test to search for a user with an invalid username (negative scenario)
@@ -92,9 +92,10 @@ public class ApiTests {
     public void testSearchUserByInvalidUsername() {
         Response response = RestAssured.get(BASE_URL + "/users?username=NonExistentUser");
 
-        assertEquals(404, response.statusCode(), "Expected HTTP status 404 for non-existent user");
-        assertTrue(response.body().asString().isEmpty(), "The response body should be empty for invalid username");
-        System.out.println("✅ testSearchUserByInvalidUsername PASSED");
+        assertEquals(200, response.statusCode(), "Expected HTTP status 200 for non-existent user");
+        List<Map<String, Object>> users = response.jsonPath().getList("$");
+        assertTrue(users.isEmpty(), "The response body should be empty for invalid username");
+        System.out.println("Test 'testSearchUserByInvalidUsername' PASSED");
     }
 
     // 7. Test to get comments for a non-existent post (negative scenario)
@@ -104,8 +105,10 @@ public class ApiTests {
 
         Response response = RestAssured.get(BASE_URL + "/posts/" + invalidPostId + "/comments");
 
-        assertEquals(404, response.statusCode(), "Expected HTTP status 404 for non-existent post ID");
-        System.out.println("✅ testCommentsForNonExistentPost PASSED");
+        assertEquals(200, response.statusCode(), "Expected HTTP status 200 for non-existent post ID");
+        List<Map<String, Object>> comments = response.jsonPath().getList("$");
+        assertTrue(comments.isEmpty(), "Expected empty response body for non-existent post ID");
+        System.out.println("Test 'testCommentsForNonExistentPost' PASSED");
     }
 
     // Utility method to check if the email format is valid
