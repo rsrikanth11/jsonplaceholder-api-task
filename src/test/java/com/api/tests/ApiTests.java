@@ -14,6 +14,9 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+
 /**
  * This class contains API tests for verifying user-related operations using RestAssured.
  * It covers:
@@ -32,28 +35,23 @@ public class ApiTests {
      * Test to verify that searching for a user by username returns the correct user.
      * 
      * Steps:
-     * - Send a GET request to retrieve user details by username "Delphine".
+     * - Send a GET request to retrieve user details by username (Delphine, Bret, Samantha).
      * - Validate that the response status is 200.
      * - Ensure the user is found.
      * 
      * Expected Result:
-     * - The response should contain the user with the specified username "Delphine".
+     * - The response should contain at least one user with the specified username.
      */
-    @Test
-    public void testSearchUserByDelphineUsername() {
-        String username = "Delphine";
+    @ParameterizedTest
+    @ValueSource(strings = {"Delphine", "Bret", "Samantha"})
+    public void testSearchUserByVariousUsernames(String username) {
         Response response = ApiUtils.getUserByUsername(username);
         assertEquals(Constants.HTTP_OK, response.statusCode(), Messages.getMessage("expected.http.status", Constants.HTTP_OK));
         
         List<Map<String, Object>> users = response.jsonPath().getList("$");
         assertTrue(users.size() > 0, Messages.getMessage("user.not.found"));
         
-        // Extract user ID dynamically
-        Integer userId = (Integer) users.get(0).get("id");
-        logger.info("Test 'testSearchUserByDelphineUsername' PASSED for username: {}", username);
-        
-        // Pass user ID to the next test
-        testSearchPostsByUser(userId);
+        logger.info("Test 'testSearchUserByVariousUsernames' PASSED for username: {}", username);
     }
 
     /**
