@@ -93,6 +93,29 @@ Tests run: 7, Failures: 0, Errors: 0, Skipped: 0
 
 If any test fails, the detailed error messages will be shown, indicating which test failed and why.
 
-### **Additional Notes**
-- **Test Coverage**: This test suite provides coverage for key API endpoints for the user "Delphine" (user with ID 4), covering both positive and negative scenarios.
+### Generating HTML Test Reports
 
+To generate HTML reports for the tests, follow these steps:
+
+1. **Run Tests**:
+   After making any changes or ensuring everything is set up, execute the tests using the following command:
+
+   ```bash
+   mvn clean test
+   ```
+
+2. **Generate HTML Report**:
+   The `maven-surefire-report-plugin` will automatically generate the test reports. To generate the HTML report, run the following command:
+
+   ```bash
+   mvn surefire-report:report
+   ```
+
+3. **Locate the Report**:
+   Once the above command runs successfully, the HTML report will be available at the following location:
+
+   ```
+   target/site/index.html
+   ```
+
+   You can open this file in a browser to view the detailed test results.
