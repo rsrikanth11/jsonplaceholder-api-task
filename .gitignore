@@ -1,0 +1,6 @@
+# Exclude macOS system files
+.DS_Store
+
+# Exclude Maven build artifacts
+target/
+
