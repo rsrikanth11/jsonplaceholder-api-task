@@ -17,6 +17,10 @@ jobs:
       - run:
           name: Run Tests
           command: mvn test  # Run all tests
+	- run:
+          name: Generate Allure Report
+          command: |
+            mvn allure:serve  # This will generate and serve the Allure report
       - run:
           name: Generate Test Report
           command: mvn surefire-report:report  # Generate Surefire test reports
