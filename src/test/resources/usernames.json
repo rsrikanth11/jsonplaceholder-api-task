@@ -1,0 +1,9 @@
+{
+    "valid_usernames": ["Delphine", "Bret", "Samantha"],
+    "invalid_usernames": ["nonExistentUser1", "userNotFound123"],
+    "edge_usernames": [
+        "",
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "!@#$%^&*()_+|"
+    ]
+}

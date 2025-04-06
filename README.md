@@ -1,121 +1,120 @@
-### **Overview**
-This project contains a suite of API tests designed to validate the behavior of the **JSONPlaceholder API**. The tests are built using **RestAssured**, **JUnit 5**, and **SLF4J** for logging.
+# JSONPlaceholder API Test Automation
 
-## API Test Suite
+## Overview
 
-The API test suite includes tests to verify:
-- Searching users by username
-- Fetching user posts and validating emails in comments
-- Handling negative test cases for non-existing users and posts
-- Edge test cases for empty and special characters in usernames
+This repository contains automated tests for the **JSONPlaceholder API**. The tests are designed to validate various aspects of the API, ensuring that it behaves as expected under different conditions. The tests are written in **Java** and use **RestAssured** for API interaction and **JUnit 5** for testing.
 
-## Dependencies
+### Key Features:
+- **Parameterized Tests** for validating different username scenarios (valid, invalid, and edge cases).
+- **Dynamic Data Loading** from JSON files.
+- **Logging** of test results using **SLF4J**.
+- **JUnit 5** for running the tests and asserting API responses.
+- **Data-Driven Approach**: The test cases use parameters loaded from a JSON file, which keeps the test data external to the codebase.
 
-This project uses the following libraries:
+## Setup
 
+### Prerequisites:
+- **Java 17** or above
+- **Maven** for dependency management
+- **SLF4J** and **Logback** for logging
 - **RestAssured** for API testing
-- **JUnit 5** for writing and running tests
-- **SLF4J** for logging
-- **Apache Commons Validator** for email validation
+- **JUnit 5** for test execution
 
-### **Test Setup**
-#### Prerequisites:
-- **Java 11+** installed on your local machine.
-- **Maven** for building the project.
-- **JUnit 5** for running tests.
-- **RestAssured** for API testing.
-- **CircleCI** setup for continuous integration.
-
-#### Steps to Set Up Locally:
+### Installation:
 1. Clone the repository:
-   ```bash
-   git clone https://github.com/rsrikanth11/jsonplaceholder-tests.git
-   cd jsonplaceholder-tests
-   ```
+    ```bash
+    git clone https://github.com/rsrikanth11/jsonplaceholder-tests.git
+    ```
+2. Navigate to the project directory:
+    ```bash
+    cd jsonplaceholder-tests
+    ```
+3. Install the required dependencies:
+    ```bash
+    mvn clean install
+    ```
 
-2. Install dependencies (assuming Maven is configured for the project):
-   ```bash
-   mvn clean install
-   ```
+## Test Scenarios
+1. Search User by Valid Usernames
+This scenario tests the ability to search for users by valid usernames.
 
-3. Run tests locally:
-   ```bash
-   mvn test
-   ```
+Input: A list of valid usernames such as Delphine, Bret, and Samantha.
 
-   This will run all the tests in the project using JUnit.
+Expected Outcome: For each valid username, the API returns a 200 OK status and the user information should be found in the response.
 
-### **Test Cases**
-The test cases validate different workflows for the JSONPlaceholder API. They include:
+2. Search User by Invalid Usernames
+This scenario tests the ability to search for non-existent usernames.
 
-Test Cases
-1. testSearchUserByVariousUsernames
-This test verifies that searching for a user by username returns the correct user. It checks for usernames such as "Delphine", "Bret", and "Samantha".
+Input: A list of invalid usernames such as nonExistentUser1 and userNotFound123.
 
-2. testSearchPostsByUser
-This test verifies that fetching posts by a user ID returns valid posts. It also validates that emails in comments are in the correct format.
+Expected Outcome: The API should return a 200 OK status, but the list of users should be empty (i.e., no users found).
 
-3. testSearchUserByInvalidUsername
-This test checks that searching for a non-existent username returns no results (HTTP status 404).
+3. Search User by Edge Case Usernames
+This scenario tests the ability of the API to handle edge case usernames like empty strings, long strings, and special characters.
 
-4. testSearchUserByEmptyUsername
-This test ensures that searching for a user by an empty string returns no results.
+Input: Edge case usernames such as an empty string (""), a very long username (more than 255 characters), and a string with special characters (!@#$%^&*()_+|).
 
-5. testSearchUserByUsernameWithSpecialChars
-This test checks that searching for a username containing special characters returns no results.
+Expected Outcome: The API should return a 200 OK status for all edge cases and handle each scenario appropriately.
 
-6. testSearchPostsByNonExistentUser
-This test ensures that searching for posts by a non-existent user ID returns no posts.
+4. Search Posts by Non-Existent User ID
+This scenario tests the ability to search for posts by a non-existent user ID.
 
+Input: A user ID that does not exist in the system, such as 9999.
 
-### **Test Execution**
-#### Running the Tests:
-You can run the tests using Maven or directly from your IDE (e.g., IntelliJ IDEA):
-- **From terminal (Maven)**:
-  ```bash
-  mvn test
-  ```
+Expected Outcome: The API should return a 200 OK status, but no posts should be found for the non-existent user.
 
-- **From IDE (e.g., IntelliJ IDEA)**:
-  - Right-click on the test class (`ApiTests.java`) and select "Run" to execute the tests.
+5. Search Posts by User ID
+This scenario tests the ability to search for posts by a valid user ID.
 
-#### Continuous Integration with CircleCI:
-Tests are also integrated into CircleCI for continuous integration. The CircleCI pipeline is configured to run all tests automatically on every commit or pull request.
+Input: A valid user ID (e.g., 1).
 
-- **CircleCI Job**: The job is configured to run the test suite using Maven.
-- You can find the CircleCI configuration in `.circleci/config.yml`.
+Expected Outcome: The API should return a 200 OK status and a list of posts. For each post, comments are fetched and validated.
 
-### **Test Results**
-After running the tests, the results will be displayed in the terminal. A successful run will show a message like:
+6. Validate Comments for Each Post
+This scenario is a part of the previous test, where for each post returned by a valid user, the comments are fetched and validated.
+
+Input: A list of posts for a given user.
+
+Expected Outcome: The API should return a 200 OK status, and for each comment, it checks if the email format is valid (using regex).
+
+## Test Execution
+
+### Running Tests:
+1. To run the tests via **Maven**, use the following command:
+    ```bash
+    mvn test
+    ```
+
+2. The tests will execute, and the results will be displayed in the console. Each test case will log its status using **SLF4J**.
+
+### Example Output:
+```plaintext
+[INFO] Running com.api.tests.ApiTests
+22:48:15.568 [main] INFO com.api.tests.ApiTests -- Test passed for invalid username: nonExistentUser1
+22:48:15.627 [main] INFO com.api.tests.ApiTests -- Test passed for invalid username: userNotFound123
+22:48:16.008 [main] INFO com.api.tests.ApiTests -- Comments validated for post ID: 1
+22:48:16.326 [main] INFO com.api.tests.ApiTests -- Comments validated for post ID: 2
+22:48:18.598 [main] INFO com.api.tests.ApiTests -- Comments validated for post ID: 10
+22:48:18.652 [main] INFO com.api.tests.ApiTests -- Test passed for valid username: Delphine
+22:48:19.199 [main] INFO com.api.tests.ApiTests -- Test passed for edge case username: !@#$%^&*()_+|
+[INFO] BUILD SUCCESS
 ```
-Tests run: 7, Failures: 0, Errors: 0, Skipped: 0
-```
 
-If any test fails, the detailed error messages will be shown, indicating which test failed and why.
+### Key Files:
+- **ApiUtils.java**: Contains utility methods for making API requests.
+- **Constants.java**: Holds constant values used throughout the project, like HTTP status codes and the base URL.
+- **Config.java**: Loads configuration values, such as the base URL.
+- **Messages.java**: Retrieves and formats localized messages for logging and validation.
+- **ApiTests.java**: Contains the test cases for validating usernames, posts, and comments.
+- **usernames.json**: Contains the test data for usernames (valid, invalid, and edge cases).
 
-### Generating HTML Test Reports
+## Additional Notes
+The tests use JUnit 5 for test execution and RestAssured for API requests.
 
-To generate HTML reports for the tests, follow these steps:
+The logger is used to track the test execution and log the results for each scenario.
 
-1. **Run Tests**:
-   After making any changes or ensuring everything is set up, execute the tests using the following command:
+All API responses are validated for HTTP 200 OK status and the expected behavior based on the scenario.
 
-   ```bash
-   mvn clean test
-   ```
+## Conclusion
 
-2. **Generate HTML Report**:
-   The `maven-surefire-report-plugin` will automatically generate the test reports. To generate the HTML report, run the following command:
-
-   ```bash
-   mvn surefire-report:report
-   ```
-
-3. **Locate the Report**:
-   Once the above command runs successfully, the HTML report will be available at the following location:
-
-   ```
-   target/site/index.html
-   ```
-
-   You can open this file in a browser to view the detailed test results.
+This project provides a solid foundation for testing the **JSONPlaceholder API** using parameterized tests, dynamic data, and proper logging. It is designed to be extendable, allowing to add more test cases and modify configurations easily.

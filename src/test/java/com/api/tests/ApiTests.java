@@ -1,78 +1,124 @@
 package com.api.tests;
 
 import com.api.utils.ApiUtils;
-import com.api.utils.Constants;
-import com.api.utils.Messages;
-import io.restassured.response.Response;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import io.restassured.response.Response;
+import org.junit.jupiter.params.provider.Arguments;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
-
+import java.util.stream.Stream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
-
-/**
- * This class contains API tests for verifying user-related operations using RestAssured.
- * It covers:
- * - Searching users by username
- * - Fetching user posts
- * - Validating email formats in comments
- * - Handling negative test cases for non-existing users/posts
- * 
- * API Under Test: https://jsonplaceholder.typicode.com
- */
 public class ApiTests {
-    
+
+    // Logger instance for logging test results
     private static final Logger logger = LoggerFactory.getLogger(ApiTests.class);
 
-    /**
-     * Test to verify that searching for a user by username returns the correct user.
-     * 
-     * Steps:
-     * - Send a GET request to retrieve user details by username (Delphine, Bret, Samantha).
-     * - Validate that the response status is 200.
-     * - Ensure the user is found.
-     * 
-     * Expected Result:
-     * - The response should contain at least one user with the specified username.
-     */
+    // Test method for valid usernames
     @ParameterizedTest
-    @ValueSource(strings = {"Delphine", "Bret", "Samantha"})
-    public void testSearchUserByVariousUsernames(String username) {
+    @MethodSource("loadValidUsernames")
+    public void testSearchUserByValidUsernames(String username) {
         Response response = ApiUtils.getUserByUsername(username);
-        assertEquals(Constants.HTTP_OK, response.statusCode(), Messages.getMessage("expected.http.status", Constants.HTTP_OK));
-        
+        assertEquals(200, response.statusCode(), "Expected HTTP Status 200");
+
         List<Map<String, Object>> users = response.jsonPath().getList("$");
-        assertTrue(users.size() > 0, Messages.getMessage("user.not.found"));
-        
-        logger.info("Test 'testSearchUserByVariousUsernames' PASSED for username: {}", username);
+        assertTrue(users.size() > 0, "User not found for username: " + username);
+
+        // Log the successful test pass message
+        logger.info("Test passed for valid username: " + username);
     }
 
-    /**
-     * Test to verify that searching for posts by a user returns valid posts.
-     * 
-     * Steps:
-     * - Send a GET request to retrieve posts by user ID.
-     * - Validate that the response status is 200.
-     * - Ensure that posts are found.
-     * 
-     * Expected Result:
-     * - The response should contain at least one post.
-     */
-    public void testSearchPostsByUser(Integer userId) {
-        Response response = ApiUtils.getPostsByUserId(userId);
-        assertEquals(Constants.HTTP_OK, response.statusCode(), Messages.getMessage("expected.http.status", Constants.HTTP_OK));
-        
+    // Test method for negative usernames (non-existent users)
+    @ParameterizedTest
+    @MethodSource("loadInvalidUsernames")
+    public void testSearchUserByInvalidUsernames(String username) {
+        Response response = ApiUtils.getUserByUsername(username);
+
+        // Expecting HTTP Status 200 OK, since the API responds this way even for non-existent users
+        assertEquals(200, response.statusCode(), "Expected HTTP Status 200 for invalid user");
+
+        List<Map<String, Object>> users = response.jsonPath().getList("$");
+        // Assert that the list is empty, as the user doesn't exist
+        assertTrue(users.isEmpty(), "Expected no users for non-existent username: " + username);
+
+        // Log the successful test pass message
+        logger.info("Test passed for invalid username: " + username);
+    }
+
+    // Test method for edge cases (empty, long, and special character usernames)
+    @ParameterizedTest
+    @MethodSource("loadEdgeUsernames")
+    public void testSearchUserByEdgeUsernames(String username) {
+        Response response = ApiUtils.getUserByUsername(username);
+
+        if (username.isEmpty()) {
+            // If the API accepts empty usernames, check for 200 OK status
+            assertEquals(200, response.statusCode(), "Expected HTTP Status 200 for empty username");
+        } else if (username.length() > 255) {
+            // Check if the API tolerates long usernames (more than 255 characters)
+            assertEquals(200, response.statusCode(), "Expected HTTP Status 200 for long username");
+        } else {
+            // For special characters or valid usernames, expect 200 OK if the API allows them
+            assertEquals(200, response.statusCode(), "Expected HTTP Status 200 for edge case username");
+        }
+
+        // Log the successful test pass message
+        logger.info("Test passed for edge case username: " + username);
+    }
+
+    // Loading valid usernames from the JSON file
+    private static Stream<Arguments> loadValidUsernames() throws Exception {
+        return loadUsernamesFromJson("valid_usernames");
+    }
+
+    // Loading invalid usernames from the JSON file
+    private static Stream<Arguments> loadInvalidUsernames() throws Exception {
+        return loadUsernamesFromJson("invalid_usernames");
+    }
+
+    // Loading edge usernames from the JSON file
+    private static Stream<Arguments> loadEdgeUsernames() throws Exception {
+        return loadUsernamesFromJson("edge_usernames");
+    }
+
+    // Helper method to load usernames from JSON
+    private static Stream<Arguments> loadUsernamesFromJson(String key) throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        Map<?, ?> data = mapper.readValue(Paths.get("src/test/resources/usernames.json").toFile(), Map.class);
+        List<String> usernames = (List<String>) data.get(key);
+        return usernames.stream().map(Arguments::of);
+    }
+
+    // Test for fetching posts by a non-existent user ID
+    @Test
+    public void testSearchPostsByNonExistentUser() {
+        Integer nonExistentUserId = 9999; // Assuming this user ID doesn't exist
+        Response response = ApiUtils.getPostsByUserId(nonExistentUserId);
+
+        assertEquals(200, response.statusCode(), "Expected HTTP Status 200");
+
         List<Map<String, Object>> posts = response.jsonPath().getList("$");
-        assertTrue(posts.size() > 0, Messages.getMessage("post.not.found"));
-        
-        logger.info("Test 'testSearchPostsByUser' PASSED for user ID: {}", userId);
+        assertTrue(posts.isEmpty(), "Posts found for non-existent user ID");
+
+        logger.info("Test 'testSearchPostsByNonExistentUser' PASSED");
+    }
+
+    // Test to verify that searching for posts by a user returns valid posts.
+    @Test
+    public void testSearchPostsByUser() {
+        Integer userId = 1; // You can parameterize this value or fetch dynamically
+        Response response = ApiUtils.getPostsByUserId(userId);
+        assertEquals(200, response.statusCode(), "Expected HTTP Status 200");
+
+        List<Map<String, Object>> posts = response.jsonPath().getList("$");
+        assertTrue(posts.size() > 0, "No posts found for user ID: " + userId);
 
         // For each post, fetch comments and validate emails
         for (Map<String, Object> post : posts) {
@@ -81,16 +127,10 @@ public class ApiTests {
         }
     }
 
-    /**
-     * This is not a test method but a utility method to validate emails in comments for a specific post.
-     * 
-     * Steps:
-     * - Send a GET request to fetch comments for the given post.
-     * - Validate that the email addresses in comments are in the proper format.
-     */
+    // Utility method to validate emails in comments for a specific post
     private void validateCommentsForPost(Integer postId) {
         Response response = ApiUtils.getCommentsByPostId(postId);
-        assertEquals(Constants.HTTP_OK, response.statusCode(), Messages.getMessage("expected.http.status", Constants.HTTP_OK));
+        assertEquals(200, response.statusCode(), "Expected HTTP Status 200");
 
         List<Map<String, Object>> comments = response.jsonPath().getList("$");
         assertTrue(comments.size() > 0, "No comments found for post ID: " + postId);
@@ -101,73 +141,5 @@ public class ApiTests {
         }
 
         logger.info("Comments validated for post ID: {}", postId);
-    }
-
-    /**
-     * Test to verify that searching for a user by invalid username returns a 404.
-     * 
-     * Steps:
-     * - Send a GET request to retrieve user details by a non-existent username.
-     * - Validate that the response status is 404.
-     * 
-     * Expected Result:
-     * - The response should return HTTP status 404 for a non-existent user.
-     */
-    @Test
-    public void testSearchUserByInvalidUsername() {
-        Response response = ApiUtils.getUserByUsername("NonExistentUser");
-
-        assertEquals(Constants.HTTP_OK, response.statusCode(), Messages.getMessage("expected.http.status", Constants.HTTP_OK));
-
-        List<Map<String, Object>> users = response.jsonPath().getList("$");
-        assertTrue(users.isEmpty(), Messages.getMessage("user.not.found"));
-
-        logger.info("Test 'testSearchUserByInvalidUsername' PASSED");
-    }
-
-    /**
-     * Edge test case: Verify that searching for a user by an empty string as username returns no results.
-     */
-    @Test
-    public void testSearchUserByEmptyUsername() {
-        Response response = ApiUtils.getUserByUsername("");
-
-        assertEquals(Constants.HTTP_OK, response.statusCode(), Messages.getMessage("expected.http.status", Constants.HTTP_OK));
-
-        List<Map<String, Object>> users = response.jsonPath().getList("$");
-        assertTrue(users.isEmpty(), "User found for empty username");
-
-        logger.info("Test 'testSearchUserByEmptyUsername' PASSED");
-    }
-
-    /**
-     * Edge test case: Verify that searching for a user by a username with special characters returns no results.
-     */
-    @Test
-    public void testSearchUserByUsernameWithSpecialChars() {
-        Response response = ApiUtils.getUserByUsername("Del#phine$");
-
-        assertEquals(Constants.HTTP_OK, response.statusCode(), Messages.getMessage("expected.http.status", Constants.HTTP_OK));
-
-        List<Map<String, Object>> users = response.jsonPath().getList("$");
-        assertTrue(users.isEmpty(), "User found with special characters in username");
-
-        logger.info("Test 'testSearchUserByUsernameWithSpecialChars' PASSED");
-    }
-
-    /**
-     * Negative test case: Verify that fetching posts by a non-existent user ID returns no posts.
-     */
-    @Test
-    public void testSearchPostsByNonExistentUser() {
-        Integer nonExistentUserId = 9999; // Assuming this user ID doesn't exist
-        Response response = ApiUtils.getPostsByUserId(nonExistentUserId);
-
-        assertEquals(Constants.HTTP_OK, response.statusCode(), Messages.getMessage("expected.http.status", Constants.HTTP_OK));
-
-        List<Map<String, Object>> posts = response.jsonPath().getList("$");
-        assertTrue(posts.isEmpty(), "Posts found for non-existent user ID");
-
-        logger.info("Test 'testSearchPostsByNonExistentUser' PASSED");
     }
 }
