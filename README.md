@@ -133,8 +133,10 @@ Passed, Failed, and Skipped Tests
 
 Test Duration
 
-
 It provides an interactive and user-friendly interface for inspecting the test results.
+
+## API_Issues.md
+This file includes the issues observed in the API, highlighting areas that need improvement or attention.
 
 ## Additional Notes
 The tests use JUnit 5 for test execution and RestAssured for API requests.
