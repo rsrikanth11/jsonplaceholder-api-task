@@ -19,7 +19,6 @@
         <restassured.version>5.4.0</restassured.version>
         <slf4j.version>2.0.12</slf4j.version>
         <logback.version>1.4.7</logback.version>
-        <commons-validator.version>1.7</commons-validator.version>
     </properties>
 
     <dependencies>
@@ -71,28 +70,16 @@
             <version>2.14.2</version>
         </dependency>
 
-        <!-- Commons Validator -->
+        <!-- Allure JUnit5 dependency -->
         <dependency>
-            <groupId>commons-validator</groupId>
-            <artifactId>commons-validator</artifactId>
-            <version>${commons-validator.version}</version>
-        </dependency>
-
-        <!-- OpenCSV for handling CSV files -->
-        <dependency>
-            <groupId>com.opencsv</groupId>
-            <artifactId>opencsv</artifactId>
-            <version>5.6</version>
+            <groupId>io.qameta.allure</groupId>
+            <artifactId>allure-junit5</artifactId>
+            <version>2.14.0</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
     <build>
-        <testResources>
-            <testResource>
-                <directory>src/test/resources</directory>
-            </testResource>
-        </testResources>
-
         <plugins>
             <!-- Maven Surefire Plugin to run tests -->
             <plugin>
@@ -104,16 +91,15 @@
                 </configuration>
             </plugin>
 
-            <!-- Maven Surefire Report Plugin for generating reports -->
+            <!-- Allure Maven plugin -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-report-plugin</artifactId>
-                <version>3.0.0-M5</version>
+                <groupId>io.qameta.allure</groupId>
+                <artifactId>allure-maven</artifactId>
+                <version>2.14.0</version>
                 <executions>
                     <execution>
-                        <phase>verify</phase>
                         <goals>
-                            <goal>report</goal>
+                            <goal>serve</goal> <!-- Generates and serves the Allure report -->
                         </goals>
                     </execution>
                 </executions>

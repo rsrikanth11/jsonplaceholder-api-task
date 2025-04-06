@@ -4,3 +4,5 @@
 # Exclude Maven build artifacts
 target/
 
+# Exclude allure results
+allure-results/
