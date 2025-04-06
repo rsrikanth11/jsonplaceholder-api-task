@@ -23,11 +23,11 @@ This repository contains automated tests for the **JSONPlaceholder API**. The te
 ### Installation:
 1. Clone the repository:
     ```bash
-    git clone https://github.com/rsrikanth11/jsonplaceholder-tests.git
+    git clone https://github.com/rsrikanth11/jsonplaceholder-api-task.git
     ```
 2. Navigate to the project directory:
     ```bash
-    cd jsonplaceholder-tests
+    cd jsonplaceholder-api-task
     ```
 3. Install the required dependencies:
     ```bash
@@ -107,6 +107,34 @@ Expected Outcome: The API should return a 200 OK status, and for each comment, i
 - **Messages.java**: Retrieves and formats localized messages for logging and validation.
 - **ApiTests.java**: Contains the test cases for validating usernames, posts, and comments.
 - **usernames.json**: Contains the test data for usernames (valid, invalid, and edge cases).
+
+## Allure Report
+
+This project is integrated with **Allure Report** to generate detailed test execution reports. Allure provides a comprehensive and visually appealing way to review test results, including pass/fail rates, durations, and additional metadata.
+
+### Generating Allure Report
+
+1. **Run the Tests**:
+   First, execute the tests and store the results in the `allure-results` directory by running:
+
+   ```bash
+   mvn clean test -Dallure.results.directory=target/allure-results
+This command will run all the test scenarios and generate the necessary result files under the target/allure-results directory.
+
+Generate and Serve the Allure Report: After the tests have been executed, generate the Allure report and serve it using the following Maven command:
+
+```bash
+mvn allure:serve
+```
+
+This will automatically generate the report and open it in your default web browser. The Allure Report will show detailed information about each test scenario, including:
+
+Passed, Failed, and Skipped Tests
+
+Test Duration
+
+
+It provides an interactive and user-friendly interface for inspecting the test results.
 
 ## Additional Notes
 The tests use JUnit 5 for test execution and RestAssured for API requests.
