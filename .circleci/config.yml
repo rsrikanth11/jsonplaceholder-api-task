@@ -17,7 +17,7 @@ jobs:
       - run:
           name: Run Tests
           command: mvn test  # Run all tests
-	- run:
+      - run:
           name: Generate Allure Report
           command: |
             mvn allure:serve  # This will generate and serve the Allure report
