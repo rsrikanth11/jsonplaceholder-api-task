@@ -23,11 +23,11 @@ This repository contains automated tests for the **JSONPlaceholder API**. The te
 ### Installation:
 1. Clone the repository:
     ```bash
-    git clone https://github.com/rsrikanth11/jsonplaceholder-tests.git
+    git clone https://github.com/rsrikanth11/jsonplaceholder-api-task.git
     ```
 2. Navigate to the project directory:
     ```bash
-    cd jsonplaceholder-tests
+    cd jsonplaceholder-api-task
     ```
 3. Install the required dependencies:
     ```bash
