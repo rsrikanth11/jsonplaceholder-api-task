@@ -133,7 +133,6 @@ Passed, Failed, and Skipped Tests
 
 Test Duration
 
-Test Logs and Screenshots (if configured)
 
 It provides an interactive and user-friendly interface for inspecting the test results.
 
